@@ -72,7 +72,7 @@ func (l *Looker) Start(ctx context.Context) error {
 func (l *Looker) notify(check *Check) {
 	l.rwMu.RLock()
 	defer l.rwMu.RUnlock()
-	log.Ctx(l.ctx).Info().Interface("check", check).Msg("notify")
+	log.Ctx(l.ctx).Info().Str("check", check.Meta.Name).Int("subscriber", len(l.subscriber)).Msg("notify")
 
 	// Caching Logic
 	if length := cap(l.Cache); length != 0 {
@@ -91,21 +91,23 @@ func (l *Looker) notify(check *Check) {
 }
 
 func (l *Looker) Subscribe(id string, c chan *Check) {
-	l.rwMu.Lock()
-	defer l.rwMu.Unlock()
-
-	log.Ctx(l.ctx).Info().Str("id", id).Msg("new subscriber")
-	if l.subscriber == nil {
-		l.subscriber = make(map[chan *Check]string)
-	}
-	l.subscriber[c] = id
 	go func() {
+		defer func() {
+			recover()
+		}()
 		for _, v := range l.Cache {
 			if v == nil {
 				break
 			}
 			c <- v
 		}
+		l.rwMu.Lock()
+		defer l.rwMu.Unlock()
+		log.Ctx(l.ctx).Info().Str("id", id).Msg("new subscriber")
+		if l.subscriber == nil {
+			l.subscriber = make(map[chan *Check]string)
+		}
+		l.subscriber[c] = id
 	}()
 }
 

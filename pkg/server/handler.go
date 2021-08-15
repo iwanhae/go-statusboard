@@ -68,8 +68,8 @@ func GetStreamHandler(looker *monitor.Looker) echo.HandlerFunc {
 					Duration:  check.Duration.Milliseconds(),
 				})
 				fmt.Fprint(r, "\n\n")
+			case <-time.After(300 * time.Millisecond):
 				r.Flush()
-				log.Ctx(ctx).Info().Msg("Flsuh")
 			case <-ctx.Done():
 				log.Ctx(ctx).Info().Msg("Catch Context Closed")
 				break loop

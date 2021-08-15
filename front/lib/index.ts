@@ -3,6 +3,7 @@ type CheckMessage = {
     duration: number
     is_success: boolean
     checked_at: Date
+    result: any
 }
 type CheckMeta = {
     name: string

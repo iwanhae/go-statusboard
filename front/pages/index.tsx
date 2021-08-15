@@ -11,8 +11,8 @@ const Home: NextPage = () => {
   const [checkList, setCheckList] = useState<Record<string, CheckMessage[]>>({})
   useEffect(() => {
     const evtSource = new EventSource("stream");
-    evtSource.onopen = function(e) {
-      console.log("open", e)
+    evtSource.onopen = function() {
+      console.log("Stream Open")
     }
     evtSource.onmessage = function(e) {
       const data : CheckMessage = JSON.parse(e.data)    
@@ -24,7 +24,7 @@ const Home: NextPage = () => {
       setCheckList(Object.assign({}, checkList))
     }
     evtSource.onerror = function(err) {
-      console.error("err", err);
+      console.error("Stream Error", err)
     };
     return () => {
       evtSource.close()
@@ -53,24 +53,33 @@ const Home: NextPage = () => {
     const m = metaMap[k]
     
     const c = checkList[k]?.sort((a,b) => a.checked_at < b.checked_at ? -1: 1 )
-    const data = c?.map((v,i) => {
-      const d = new Date(v.checked_at)      
-      return {
-        x: d.getTime(),
-        y: v.duration
-      }
-    })
+    const s = c?.filter(v => v.is_success)
+    const f = c?.filter(v => !v.is_success)
+    const success = s?.map((v,i) => {return {x: v.checked_at.getTime(),y: v.duration}})
+    const failed = f?.map((v,i) => {return {x: v.checked_at.getTime(),y: v.duration}})
+
     return <div className={styles.card} key={m.name}>
       <h2>{m.name}</h2>
-      <p>{m.description}</p>
+      <p>{m.description}</p> 
+      {c?.length > 0 && 
+        <p className={styles.fadeout}>
+          {c[0].checked_at.toLocaleTimeString()} ~ {c[c.length-1].checked_at.toLocaleTimeString()}
+        </p>
+      }
       <div>
         <XYPlot height={250} width={682}>
           <VerticalGridLines />
           <HorizontalGridLines />
           <YAxis title="ms" />
-          <LineSeries data={data} />
+          <LineSeries data={success}  color="green"/>
+          <LineSeries data={failed}  color="red"/>
         </XYPlot>
       </div>
+      {f?.length > 0 && 
+      <p>
+        Last Failiure:
+        {JSON.stringify(f[f.length-1].result)}
+      </p>}
     </div>
   })
 
