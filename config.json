@@ -1,0 +1,46 @@
+{
+    "checks": {
+        "http": [
+            {
+                "name": "Naver",
+                "description": "monitoring naver",
+                "method": "GET",
+                "endpoint": "https://www.naver.com/",
+                "timeout": "10s",
+                "interval": "5s"
+            },
+            {
+                "name": "Google",
+                "description": "monitoring google",
+                "method": "GET",
+                "endpoint": "https://www.google.com/",
+                "timeout": "10s",
+                "interval": "5s"
+            },
+            {
+                "name": "Local",
+                "description": "monitoring local object",
+                "method": "GET",
+                "endpoint": "http://192.168.0.1",
+                "timeout": "10s",
+                "interval": "1s"
+            },
+            {
+                "name": "Blog",
+                "description": "monitoring blog",
+                "method": "GET",
+                "endpoint": "https://blog.iwanhae.kr",
+                "timeout": "10s",
+                "interval": "1s"
+            },
+            {
+                "name": "Self",
+                "description": "monitoring self",
+                "method": "GET",
+                "endpoint": "http://127.0.0.1",
+                "timeout": "10s",
+                "interval": "1s"
+            }
+        ]
+    }
+}
